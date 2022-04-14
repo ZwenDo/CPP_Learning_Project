@@ -1,0 +1,79 @@
+#################### TASK 0
+
+A/
+- Il faut utiliser la touche 'C' pour ajouter un avion.
+- Pour quitter le programme, il faut utiliser la touche 'Q'.
+- La touche 'F' permet d'entrer et sortir du mode plein écran.
+
+- L'avion atterrit, les passagers transitent puis l'avion redécolle.
+- La console fournit toujours les informations avec l'immatriculation de l'avion,
+elle indique lorsqu'un avion atterrit, commence à décharger les passagers, termine le déchargement et
+lorsqu'il redécolle.
+
+- Les avions atterrissent (puis déchargent leurs passagers) quand la piste est libre et si elle n'est pas libre, ils tournent
+dans l'espace aérien autour de l'aéroport.
+
+
+B/
+
+TODO faire le schéma
+
+Aircraft:
+- La classe représente un avion et permet de manipuler ceux-ci
+- Fonctions membres:
+    get_flight_num: getter qui renvoie l'immatriculation de l'avion
+    distance_to: calcule la distance de l'avion par rapport à un point
+    display: affiche l'afion
+    move: déplace l'avion vers son prochain waypoint pour une frame
+
+AircraftType:
+- La structure représente un modèle d'avion (vitesse au sol, en l'air, accélération max, texture)
+
+Airport:
+- La classe représente un aéroport
+- Fonctions membres:
+    get_tower: renvoie la tour de l'aéroport
+    dirplay: affiche l'aéroport
+    move: fais avancer le service de tous les terminaux de l'aéroport
+
+AirportType:
+- La classe représente un type d'aéroport (position des terminaux, piste d'atterrissage)
+
+Point2D:
+- Représente un point dans un espace en 2 dimensions
+
+Runway:
+- Représente une piste d'atterrissage (à l'aide de ses coordonnées relatives à l'aéroport)
+
+Terminal:
+- Représente un terminal de l'aéroport qui permet aux avions de décharger leurs passagers
+- Fonctions membres:
+    in_use: renvoie si un avion est en train d'utiliser le terminal
+    is_servicing: renvoie si le terminal a terminé le déchargement de l'avion actuel
+    assign_craft: assigne un avion au terminal
+    finish_service: termine le servicing si le terminal a terminé ses cycles de service
+    move: fait avancer le service du terminal
+
+Tower:
+- Représente une tour qui permet de savoir sur quel terminal se trouve un avion
+- Fonctions membres:
+    TODO get_circle
+    find_craft_and_terminal: trouve sur quel terminal se trouve un avion si il est sur l'un d'eux
+    arrived_at_terminal: assigne un avion a un terminal
+    get_instructions: détermine les instructions à suivre pour un avion
+
+TowerSimulation:
+- Représente l'objet qui contrôle le programme de simulation d'aéroport
+
+Waypoint:
+- Représente un point sur l'itinéraire d'un avion
+
+
+C/
+
+2. Le nombre de framerate devient très élevé si on essaie de diminuer trop bas.
+
+3. Dans le fichier config.hpp le champ SERVICE_CYCLES
+
+4.
+#################### TASK 1

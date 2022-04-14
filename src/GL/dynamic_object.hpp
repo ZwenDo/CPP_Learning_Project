@@ -10,6 +10,10 @@ public:
     virtual ~DynamicObject() {}
 
     virtual void move() = 0;
+
+    virtual bool must_remove() const {
+        return false;
+    }
 };
 
 inline std::unordered_set<DynamicObject*> move_queue;

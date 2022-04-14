@@ -73,10 +73,18 @@ void display(void)
 
 void timer(const int step)
 {
-    for (auto& item : move_queue)
+    if (!paused)
     {
-        item->move();
+        for (auto& item : move_queue)
+        {
+            item->move();
+        }
     }
+
+    move_queue.erase(std::remove_if(move_queue.begin(), move_queue.end(),
+                                    [](const DynamicObject* o) { return o->must_remove(); }),
+                     move_queue.end());
+
     glutPostRedisplay();
     glutTimerFunc(1000u / ticks_per_sec, timer, step + 1);
 }

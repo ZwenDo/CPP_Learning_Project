@@ -18,6 +18,7 @@
 
 namespace GL {
 
+inline bool paused                = false;
 inline unsigned int ticks_per_sec = DEFAULT_TICKS_PER_SEC;
 inline float zoom                 = DEFAULT_ZOOM;
 inline bool fullscreen            = false;
