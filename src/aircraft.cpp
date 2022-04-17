@@ -76,9 +76,11 @@ void Aircraft::operate_landing_gear()
     }
 }
 
-void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
+
+template<bool front>
+void Aircraft::add_waypoint(const Waypoint& wp)
 {
-    if (front)
+    if constexpr (front)
     {
         waypoints.push_front(wp);
     }
@@ -88,18 +90,34 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
     }
 }
 
-void Aircraft::move()
+void Aircraft::move(float delta)
 {
+    assert(delta >= 0.f && "delta must be positive");
+
+    if (is_circling())
+    {
+        auto wp = control.reserve_terminal(*this);
+        if (!wp.empty())
+        {
+            waypoints.clear();
+            for (const auto &item : wp) {
+                add_waypoint<false>(item);
+            }
+        }
+    }
+
     if (waypoints.empty())
     {
-        waypoints = control.get_instructions(*this);
+        for (const auto &item : control.get_instructions(*this)) {
+            add_waypoint<false>(item);
+        }
     }
 
     if (!is_at_terminal)
     {
         turn_to_waypoint();
         // move in the direction of the current speed
-        pos += speed;
+        pos += speed * delta;
 
         // if we are close to our next waypoint, stike if off the list
         if (!waypoints.empty() && distance_to(waypoints.front()) < DISTANCE_THRESHOLD)
@@ -120,7 +138,7 @@ void Aircraft::move()
             if (!landing_gear_deployed)
             {
                 using namespace std::string_literals;
-                throw AircraftCrash { flight_number + " crashed into the ground"s };
+                throw AircraftCrash { flight_number, pos, speed, " crashed into the ground"s };
             }
         }
         else
@@ -131,6 +149,12 @@ void Aircraft::move()
             {
                 pos.z() -= SINK_FACTOR * (SPEED_THRESHOLD - speed_len);
             }
+            fuel--;
+            if (fuel <= 0)
+            {
+                using namespace std::string_literals;
+                throw AircraftCrash { flight_number, pos, speed, " ran out of fuel"s };
+            }
         }
 
         // update the z-value of the displayable structure
@@ -140,10 +164,21 @@ void Aircraft::move()
 
 void Aircraft::display() const
 {
-    type.texture.draw(project_2D(pos), { PLANE_TEXTURE_DIM, PLANE_TEXTURE_DIM }, get_speed_octant());
+    type.texture.draw(project_2D(pos), Point2D { PLANE_TEXTURE_DIM, PLANE_TEXTURE_DIM }, get_speed_octant());
 }
 
 bool Aircraft::must_remove() const
 {
-    return done_servicing;
+    return (done_servicing && waypoints.empty()) || fuel == 0;
+}
+
+void Aircraft::refill(int& fuel_stock)
+{
+    int value = std::min(fuel_stock, MAX_FUEL - fuel);
+    fuel += value;
+    fuel_stock -= value;
+    if (value > 0)
+    {
+        std::cout << "Aicraft refilled with " << value << " fuel." << std::endl;
+    }
 }

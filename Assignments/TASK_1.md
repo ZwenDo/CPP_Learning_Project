@@ -7,6 +7,11 @@ Chaque avion créé est ensuite placé dans les files `GL::display_queue` et `GL
 
 Imaginez et décrivez ce que vous devriez faire si vous souhaitiez accéder à l'avion ayant le numéro de vol "AF1250".
 
+> Actuellement, il n'est pas possible d'accéder à un avion à l'aide de son numéro de série en dehors des move et
+display queues. Un moyen simple pour y parvenir serait de créer une map de numéro de série vers avion. Ainsi, lors
+de la création d'un avion on l'ajoute à la map. Lors de la destruction d'un avion, on ne doit pas oublier de
+l'enlever de la map.
+
 ---
 
 ## Objectif 1 - Référencement des avions
@@ -30,8 +35,18 @@ Il serait donc bon de savoir qui est censé détruire les avions du programme, a
 
 Répondez aux questions suivantes :
 1. Qui est responsable de détruire les avions du programme ? (si vous ne trouvez pas, faites/continuez la question 4 dans TASK_0)
+
+> C'est la fonction timer qui est responsable de détruire les avions.
+
 2. Quelles sont les listes qui contiennent une référence sur un avion au moment où il doit être détruit ?
+
+> Les listes ``display_queue`` et ``move_queue`` ont des références vers les avions au moment de les détruire.
+
 3. Comment fait-on pour supprimer la référence sur un avion qui va être détruit dans ces deux structures ?
+
+> On le supprime manuellement de la move_queue, quant à la display_queue, comme stipulé dans la task 0, les displayables
+> se retirent tout seuls de la display_queue dans leur destructeur.
+
 
 Pour simplifier le programme, l'`AircraftManager` aura l'ownership des avions, c'est-à-dire que c'est lui qui s'occupera de les faire disparaître du programme, et non plus la fonction `timer`. Il aura également la responsabilité de les faire bouger.
 
@@ -75,6 +90,10 @@ Vous lui ajouterez un constructeur dont le rôle sera d'appeler les fonctions d'
 
 Vous pouvez maintenant ajoutez un attribut `context_initializer` de type `ContextInitializer` dans la classe `TowerSimulation`.
 A quelle ligne faut-il définir `context_initializer` dans `TowerSimulation` pour s'assurer que le constructeur de `context_initializer` est appelé avant celui de `factory` ?
+
+> On a définit un context intializer qui sert à initialiser les paramètres nécessaires dans son constructeur.
+On doit ensuite créer cet objet en tout premier lieu dans le constructeur de la classe tower_sim pour que lors de la
+création de la factory, les paramètres soient déjà initialisés.
 
 Refactorisez le restant du code pour utiliser votre factory.
 Vous devriez du coup pouvoir supprimer les variables globales `airlines` et `aircraft_types`.

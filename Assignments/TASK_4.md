@@ -23,6 +23,11 @@ for (const auto& wp: control.get_instructions(*this))
 2. Modifiez `Aircraft::add_waypoint` afin que l'évaluation du flag ait lieu à la compilation et non à l'exécution.
 Que devez-vous changer dans l'appel de la fonction pour que le programme compile ?
 
+> On doit créer un template qui attend un booléen front qui sert à déterminer si l'ajout se fait
+par l'avant ou l'arrière. La valeur de ce template est évaluée dans un if constexpr, afin que le
+bon appel soit remplacé à la compilation. On doit donc à présent appeler la fonction ``add_waipoint`` avec
+la valeur de front entre chevrons plutôt qu'en paramètre.
+
 3. **BONUS** En utilisant [GodBolt](https://godbolt.org/), comparez le code-assembleur généré par les fonctions suivantes:
 <table border="0">
  <tr>

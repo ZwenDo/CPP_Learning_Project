@@ -13,6 +13,10 @@
 class Aircraft : public GL::Displayable, public GL::DynamicObject
 {
 private:
+    constexpr static int FUEL_THRESHOLD = 200;
+    constexpr static int MAX_FUEL = 3000;
+    constexpr static int MIN_FUEL = 150;
+
     const AircraftType& type;
     const std::string flight_number;
     Point3D pos, speed; // note: the speed should always be normalized to length 'speed'
@@ -21,6 +25,7 @@ private:
     bool landing_gear_deployed = false; // is the landing gear deployed?
     bool is_at_terminal        = false;
     bool done_servicing        = false;
+    int fuel = MIN_FUEL + rand() % (MAX_FUEL - MIN_FUEL);
 
     // turn the aircraft to arrive at the next waypoint
     // try to facilitate reaching the waypoint after the next by facing the
@@ -38,14 +43,16 @@ private:
     void arrive_at_terminal();
     // deploy and retract landing gear depending on next waypoints
     void operate_landing_gear();
-    void add_waypoint(const Waypoint& wp, const bool front);
+
+    template<bool front>
+    void add_waypoint(const Waypoint& wp);
     bool is_on_ground() const { return pos.z() < DISTANCE_THRESHOLD; }
     float max_speed() const { return is_on_ground() ? type.max_ground_speed : type.max_air_speed; }
-
     Aircraft(const Aircraft&) = delete;
-    Aircraft& operator=(const Aircraft&) = delete;
 
+    Aircraft& operator=(const Aircraft&) = delete;
 public:
+
     Aircraft(const AircraftType& type_, const std::string_view& flight_number_, const Point3D& pos_,
              const Point3D& speed_, Tower& control_) :
         GL::Displayable { pos_.x() + pos_.y() },
@@ -58,13 +65,26 @@ public:
         speed.cap_length(max_speed());
     }
 
+    ~Aircraft() override { control.release_terminal(*this);
+    };
     const std::string& get_flight_num() const { return flight_number; }
+
     void service_done() { done_servicing = true; }
     float distance_to(const Point3D& p) const { return pos.distance_to(p); }
+    bool has_terminal() const { return !waypoints.empty() && waypoints.back().is_at_terminal(); }
+    bool is_circling() const {
+        return !waypoints.empty() && waypoints.back().is_circling();
+    }
+    int get_fuel() const { return fuel; }
+    bool is_low_on_fuel() const { return fuel < FUEL_THRESHOLD; }
+    void refill(int& fuel_stock);
 
     void display() const override;
-    void move() override;
-    bool must_remove() const override;
+    void move(float delta) override;
+
+    bool must_remove() const;
 
     friend class Tower;
+    friend class AircraftManager;
+    void add_waypoint(const Waypoint& wp);
 };

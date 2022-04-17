@@ -1,5 +1,6 @@
 #pragma once
 
+#include "geometry.hpp"
 #include "img/media_path.hpp"
 
 #include <stdexcept>
@@ -28,4 +29,20 @@ constexpr float DEFAULT_ZOOM = 2.0f;
 constexpr size_t DEFAULT_WINDOW_WIDTH  = 800;
 constexpr size_t DEFAULT_WINDOW_HEIGHT = 600;
 
-using AircraftCrash = std::runtime_error;
+class AircraftCrash : public std::runtime_error
+{
+public:
+    AircraftCrash(const std::string& flight_number, const Point3D& position, const Point3D& speed,
+                  const std::string& reason) :
+        std::runtime_error(get_message(flight_number, position, speed, reason))
+    {}
+
+private:
+    static std::string get_message(const std::string& flight_number, const Point3D& position,
+                                          const Point3D& speed, const std::string& reason)
+    {
+        using namespace std::string_literals;
+        return flight_number + " crashed at "s + position.to_string() + " with a speed of "s +
+               speed.to_string() + "\nReason: "s + reason;
+    }
+};

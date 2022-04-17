@@ -73,20 +73,19 @@ void display(void)
 
 void timer(const int step)
 {
+    int t = glutGet(GLUT_ELAPSED_TIME);
+    float dt = (float) (t - last_frame) * (framerate / 1000.f);
+    last_frame = t;
     if (!paused)
     {
-        for (auto& item : move_queue)
+        for (const auto &item : move_queue)
         {
-            item->move();
+            item->move(dt);
         }
     }
 
-    move_queue.erase(std::remove_if(move_queue.begin(), move_queue.end(),
-                                    [](const DynamicObject* o) { return o->must_remove(); }),
-                     move_queue.end());
-
     glutPostRedisplay();
-    glutTimerFunc(1000u / ticks_per_sec, timer, step + 1);
+    glutTimerFunc(1000 / ticks_per_sec, timer, step + 1);
 }
 
 void init_gl(int argc, char** argv, const char* title)

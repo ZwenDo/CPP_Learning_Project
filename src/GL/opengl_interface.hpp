@@ -22,6 +22,8 @@ inline bool paused                = false;
 inline unsigned int ticks_per_sec = DEFAULT_TICKS_PER_SEC;
 inline float zoom                 = DEFAULT_ZOOM;
 inline bool fullscreen            = false;
+inline int last_frame             = 0;
+inline float framerate      = DEFAULT_TICKS_PER_SEC;
 
 using KeyStroke = std::function<void(void)>;
 
